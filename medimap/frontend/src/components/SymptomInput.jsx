@@ -1,8 +1,54 @@
-import { Search, Mic, Sparkles } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
+import { Search, Mic, MicOff, Sparkles } from 'lucide-react';
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 const SymptomInput = ({ symptoms, setSymptoms, onSearch, isLoading }) => {
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef(null);
+
+  const toggleVoice = useCallback(() => {
+    if (!SpeechRecognition) {
+      alert('Voice input is not supported in this browser. Try Chrome or Edge.');
+      return;
+    }
+
+    if (listening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognitionRef.current = recognition;
+
+    let finalTranscript = symptoms;
+
+    recognition.onresult = (event) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += (finalTranscript ? ' ' : '') + transcript;
+        } else {
+          interim = transcript;
+        }
+      }
+      setSymptoms(finalTranscript + (interim ? ' ' + interim : ''));
+    };
+
+    recognition.onend = () => setListening(false);
+    recognition.onerror = () => setListening(false);
+
+    recognition.start();
+    setListening(true);
+  }, [listening, symptoms, setSymptoms]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (listening) recognitionRef.current?.stop();
     onSearch();
   };
 
@@ -37,10 +83,15 @@ const SymptomInput = ({ symptoms, setSymptoms, onSearch, isLoading }) => {
             
             <button
               type="button"
-              className="p-3 text-gray-600 hover:text-primary-400 hover:bg-primary-500/10 rounded-xl transition-all duration-200 flex-shrink-0"
-              title="Voice input (UI only)"
+              onClick={toggleVoice}
+              className={`p-3 rounded-xl transition-all duration-200 flex-shrink-0 ${
+                listening
+                  ? 'text-red-400 bg-red-500/15 animate-pulse'
+                  : 'text-gray-600 hover:text-primary-400 hover:bg-primary-500/10'
+              }`}
+              title={listening ? 'Stop listening' : 'Voice input'}
             >
-              <Mic className="h-5 w-5" />
+              {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
             </button>
             
             <button
