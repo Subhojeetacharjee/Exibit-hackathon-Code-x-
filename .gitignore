@@ -1,8 +1,35 @@
+# Dependencies
 node_modules/
-dist/
-.vite/
-*.local
+vendor/
+
+# Environment variables
 .env
-.env.*
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+out/
+.vite/
+
+# OS files
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE / Editor
+.idea/
+*.swp
+*.swo
+
+# Coverage
+coverage/
+
+# Misc
+*.tmp
+*.bak
+*.local
