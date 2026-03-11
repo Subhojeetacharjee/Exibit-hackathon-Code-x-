@@ -1,12 +1,14 @@
-# Symptom-to-Specialist Mapper
+# MediMap — Symptom to Specialist Mapper
 
-A small MVP web app that maps user-described symptoms to the right medical specialist and shows nearby clinics on a map.
+A full-stack web app that maps user-described symptoms to the right medical specialist and shows nearby clinics on Google Maps with real-time data.
 
 ## Stack
 
-- **Backend:** Python FastAPI + Uvicorn, SQLite with SQLModel
-- **Frontend:** React + Tailwind CSS (Vite)
-- **Maps:** Google Maps JavaScript API + Google Places Nearby Search (v1)
+- **Backend:** Python FastAPI + Uvicorn, SQLite with SQLModel, httpx
+- **Frontend:** React 19 + Vite 7.3 + Tailwind CSS 3.4 + React Router DOM 7
+- **Maps:** Google Maps JavaScript API (dark theme)
+- **Clinic Data:** Google Places API (New) — Text Search with phone numbers & opening hours
+- **Icons:** Lucide React
 
 ## Setup
 
@@ -40,9 +42,31 @@ npm run dev
 
 Frontend runs at `http://localhost:5173`.
 
+## Features
+
+- **Symptom Analysis** — Natural language symptom input mapped to 14+ specialties via keyword rule engine
+- **Google Maps** — Dark-themed map with cyan clinic markers and red current-location marker
+- **Clinic Cards** — Real data: name, address, distance, rating, open/closed status
+- **Details Panel** — Phone number (clickable) and full weekly opening hours
+- **Sort** — By distance or best rated
+- **Emergency SOS** — Overlay with ambulance call button for critical symptoms
+- **Search History** — Persisted in localStorage
+- **Health Tips** — Context-aware tips based on detected symptoms
+- **User Profiles** — SQLite-backed profile creation
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Health check |
+| POST | `/api/predict-specialist` | Analyze symptoms → specialist, urgency, tips |
+| POST | `/api/nearby-clinics` | Fetch nearby clinics from Google Places |
+| POST | `/api/profile` | Create user profile |
+
 ## Usage
 
-1. Fill in a health profile (name, age, gender, health status).
-2. Describe your symptoms in the text area and submit.
-3. If the symptoms indicate an emergency, an overlay appears with an ambulance call button.
-4. Otherwise, nearby clinics for the matched specialty are shown on the map and in a card list.
+1. Open `http://localhost:5173` and allow location access.
+2. Describe your symptoms and submit.
+3. View the matched specialist, health tips, and nearby clinics on the map.
+4. Click **Details** on any clinic card for phone and hours.
+5. Click **Directions** to open Google Maps navigation.
