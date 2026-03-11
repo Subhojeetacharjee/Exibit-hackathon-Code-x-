@@ -1,0 +1,767 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Theme CSS Variables ---- */
+:root {
+  /* Page / surface backgrounds */
+  --color-page: #000000;
+  --color-surface: #050505;
+  --color-surface-alt: #0a0a0a;
+  --color-surface-dim: #111111;
+
+  /* Overlay / semi-transparent surfaces */
+  --color-overlay: rgba(0, 0, 0, 0.8);
+  --color-overlay-90: rgba(0, 0, 0, 0.9);
+  --color-overlay-95: rgba(0, 0, 0, 0.95);
+  --color-surface-alpha-03: rgba(255, 255, 255, 0.03);
+  --color-surface-alpha-04: rgba(255, 255, 255, 0.04);
+  --color-surface-alpha-05: rgba(255, 255, 255, 0.05);
+  --color-surface-alpha-08: rgba(255, 255, 255, 0.08);
+  --color-surface-alpha-10: rgba(255, 255, 255, 0.10);
+
+  /* Text */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e5e7eb;   /* gray-200 */
+  --color-text-tertiary: #d1d5db;    /* gray-300 */
+  --color-text-muted: #9ca3af;       /* gray-400 */
+  --color-text-subtle: #6b7280;      /* gray-500 */
+  --color-text-faint: #4b5563;       /* gray-600 */
+  --color-text-dim: #374151;         /* gray-700 */
+  --color-body-text: #e0e0e0;
+  --color-placeholder: #4b5563;
+
+  /* Borders */
+  --color-border-subtle: rgba(255, 255, 255, 0.04);
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-medium: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.10);
+
+  /* Button text on primary bg */
+  --color-on-primary: #000000;
+
+  /* Accent ring */
+  --color-ring: #000000;
+
+  /* Gradient hero */
+  --color-hero-via: #001a1f;
+  --color-hero-glow: rgba(0, 229, 255, 0.05);
+  --color-tips-from: #001a00;
+  --color-tips-via: #001200;
+  --color-tips-to: #000a00;
+
+  /* SVG wave fill */
+  --color-wave-fill: #000000;
+
+  /* Scrollbar */
+  --color-scrollbar-track: #000000;
+  --color-scrollbar-thumb: #1a1a1a;
+
+  /* Shadows */
+  --shadow-card-hover: 0 20px 40px -12px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 229, 255, 0.12);
+
+  /* Skeleton */
+  --skeleton-from: #0a0a0a;
+  --skeleton-mid: #141414;
+}
+
+/* ---- Light Mode ---- */
+.light-mode {
+  --color-page: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f1f5f9;
+  --color-surface-dim: #e2e8f0;
+
+  --color-overlay: rgba(255, 255, 255, 0.85);
+  --color-overlay-90: rgba(255, 255, 255, 0.92);
+  --color-overlay-95: rgba(255, 255, 255, 0.95);
+  --color-surface-alpha-03: rgba(0, 0, 0, 0.03);
+  --color-surface-alpha-04: rgba(0, 0, 0, 0.04);
+  --color-surface-alpha-05: rgba(0, 0, 0, 0.05);
+  --color-surface-alpha-08: rgba(0, 0, 0, 0.06);
+  --color-surface-alpha-10: rgba(0, 0, 0, 0.08);
+
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #1e293b;
+  --color-text-tertiary: #334155;
+  --color-text-muted: #475569;
+  --color-text-subtle: #64748b;
+  --color-text-faint: #94a3b8;
+  --color-text-dim: #cbd5e1;
+  --color-body-text: #334155;
+  --color-placeholder: #94a3b8;
+
+  --color-border-subtle: rgba(0, 0, 0, 0.05);
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-medium: rgba(0, 0, 0, 0.12);
+  --color-border-strong: rgba(0, 0, 0, 0.15);
+
+  --color-on-primary: #000000;
+
+  --color-ring: #ffffff;
+
+  --color-hero-via: #e0f7fa;
+  --color-hero-glow: rgba(0, 229, 255, 0.08);
+  --color-tips-from: #f0fdf4;
+  --color-tips-via: #ecfdf5;
+  --color-tips-to: #f0fdf4;
+
+  --color-wave-fill: #f8fafc;
+
+  --color-scrollbar-track: #f1f5f9;
+  --color-scrollbar-thumb: #cbd5e1;
+
+  --shadow-card-hover: 0 20px 40px -12px rgba(0, 0, 0, 0.1), 0 0 25px rgba(0, 150, 167, 0.08);
+
+  --skeleton-from: #e2e8f0;
+  --skeleton-mid: #f1f5f9;
+}
+
+/* Light‐mode specifics for Tailwind shadow utilities */
+.light-mode .shadow-soft {
+  --tw-shadow: 0 2px 15px -3px rgba(0,0,0,0.08), 0 2px 6px -4px rgba(0,0,0,0.06) !important;
+}
+.light-mode .shadow-card {
+  --tw-shadow: 0 4px 25px -5px rgba(0,0,0,0.08), 0 0 15px rgba(0,150,167,0.06) !important;
+}
+.light-mode .shadow-elevated {
+  --tw-shadow: 0 10px 40px -10px rgba(0,0,0,0.12), 0 0 20px rgba(0,150,167,0.06) !important;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--color-page);
+  color: var(--color-body-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar-thumb);
+  border-radius: 100px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00e5ff;
+}
+
+/* Leaflet overrides */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 1rem;
+}
+
+/* ---- Animations ---- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-ring {
+  0%   { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+.animate-fade-in-up   { animation: fadeInUp .6s ease-out both; }
+.animate-fade-in      { animation: fadeIn .5s ease-out both; }
+.animate-slide-down   { animation: slideDown .4s ease-out both; }
+.animate-scale-in     { animation: scaleIn .4s ease-out both; }
+.animate-float        { animation: float 6s ease-in-out infinite; }
+.animate-gradient     { animation: gradient-shift 8s ease infinite; background-size: 200% 200%; }
+
+.delay-100 { animation-delay: .1s; }
+.delay-200 { animation-delay: .2s; }
+.delay-300 { animation-delay: .3s; }
+.delay-400 { animation-delay: .4s; }
+.delay-500 { animation-delay: .5s; }
+.delay-600 { animation-delay: .6s; }
+
+/* Glass effect utility */
+.glass {
+  background: var(--color-overlay);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+}
+
+/* Glow shadow utilities */
+.shadow-glow-blue {
+  box-shadow: 0 0 25px -5px rgba(0, 229, 255, 0.5), 0 0 50px -10px rgba(0, 229, 255, 0.2);
+}
+.shadow-glow-green {
+  box-shadow: 0 0 25px -5px rgba(57, 255, 20, 0.5), 0 0 50px -10px rgba(57, 255, 20, 0.2);
+}
+
+/* Skeleton loading animation */
+.skeleton {
+  background: linear-gradient(90deg, var(--skeleton-from) 25%, var(--skeleton-mid) 50%, var(--skeleton-from) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Neon text glow */
+.text-glow {
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.6), 0 0 20px rgba(0, 229, 255, 0.3);
+}
+.text-glow-green {
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.6), 0 0 20px rgba(57, 255, 20, 0.3);
+}
+
+/* Light mode: disable neon glow effects */
+.light-mode .text-glow,
+.light-mode .text-glow-green {
+  text-shadow: none;
+}
+.light-mode .shadow-glow-blue,
+.light-mode .shadow-glow-green {
+  box-shadow: none;
+}
+.light-mode .shadow-neon {
+  --tw-shadow: 0 0 0 transparent !important;
+}
+
+/* Neon border glow */
+.border-glow {
+  box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.05), 0 0 10px rgba(0, 229, 255, 0.1);
+}
+
+/* Badge pulse ring */
+.pulse-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ================================================================
+   LIGHT MODE — Global class overrides
+   Applied when <html class="light-mode"> is set
+   ================================================================ */
+
+/* ---- Background overrides ---- */
+.light-mode .bg-black {
+  background-color: var(--color-page) !important;
+}
+.light-mode .bg-\[\#050505\],
+.light-mode .bg-\[\#050505\]\/90,
+.light-mode .bg-\[\#050505\]\/95 {
+  background-color: var(--color-surface) !important;
+}
+.light-mode .bg-\[\#0a0a0a\] {
+  background-color: var(--color-surface-alt) !important;
+}
+.light-mode .bg-\[\#111\],
+.light-mode .bg-\[\#111111\] {
+  background-color: var(--color-surface-dim) !important;
+}
+
+/* Semi-transparent surface backgrounds */
+.light-mode .bg-white\/\[0\.03\] {
+  background-color: var(--color-surface-alpha-03) !important;
+}
+.light-mode .bg-white\/\[0\.04\] {
+  background-color: var(--color-surface-alpha-04) !important;
+}
+.light-mode .bg-white\/\[0\.05\] {
+  background-color: var(--color-surface-alpha-05) !important;
+}
+.light-mode .bg-white\/\[0\.08\] {
+  background-color: var(--color-surface-alpha-08) !important;
+}
+.light-mode .bg-white\/5 {
+  background-color: var(--color-surface-alpha-05) !important;
+}
+.light-mode .bg-white\/10 {
+  background-color: var(--color-surface-alpha-10) !important;
+}
+.light-mode .bg-white\/20 {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Hover states */
+.light-mode .hover\:bg-white\/\[0\.04\]:hover {
+  background-color: var(--color-surface-alpha-04) !important;
+}
+.light-mode .hover\:bg-white\/\[0\.05\]:hover {
+  background-color: var(--color-surface-alpha-05) !important;
+}
+.light-mode .hover\:bg-white\/\[0\.08\]:hover {
+  background-color: var(--color-surface-alpha-08) !important;
+}
+.light-mode .hover\:bg-\[\#0a0a0a\]:hover {
+  background-color: var(--color-surface-alt) !important;
+}
+
+/* Nav overlay backgrounds */
+.light-mode .bg-black\/90 {
+  background-color: var(--color-overlay-90) !important;
+}
+.light-mode .bg-black\/95 {
+  background-color: var(--color-overlay-95) !important;
+}
+.light-mode .bg-black\/80 {
+  background-color: rgba(248, 250, 252, 0.8) !important;
+}
+
+/* ---- Gradient overrides ---- */
+.light-mode .from-black {
+  --tw-gradient-from: var(--color-page) !important;
+}
+.light-mode .via-\[\#001a1f\] {
+  --tw-gradient-via: var(--color-hero-via) !important;
+}
+.light-mode .to-black {
+  --tw-gradient-to: var(--color-page) !important;
+}
+.light-mode .from-black\/80 {
+  --tw-gradient-from: rgba(248, 250, 252, 0.8) !important;
+}
+.light-mode .from-\[\#001a1f\] {
+  --tw-gradient-from: var(--color-hero-via) !important;
+}
+
+/* Health tips gradient */
+.light-mode .from-\[\#001a00\] {
+  --tw-gradient-from: var(--color-tips-from) !important;
+}
+.light-mode .via-\[\#001200\] {
+  --tw-gradient-via: var(--color-tips-via) !important;
+}
+.light-mode .to-\[\#000a00\] {
+  --tw-gradient-to: var(--color-tips-to) !important;
+}
+
+/* Radial gradient backgrounds */
+.light-mode [class*="bg-\[radial-gradient"] {
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+/* ---- Text overrides ---- */
+.light-mode .text-white {
+  color: var(--color-text-primary) !important;
+}
+.light-mode .text-gray-200 {
+  color: var(--color-text-secondary) !important;
+}
+.light-mode .text-gray-300 {
+  color: var(--color-text-tertiary) !important;
+}
+.light-mode .text-gray-400 {
+  color: var(--color-text-muted) !important;
+}
+.light-mode .text-gray-500 {
+  color: var(--color-text-subtle) !important;
+}
+.light-mode .text-gray-600 {
+  color: var(--color-text-faint) !important;
+}
+.light-mode .text-gray-700 {
+  color: var(--color-text-dim) !important;
+}
+
+/* Placeholder overrides */
+.light-mode .placeholder-gray-600::placeholder {
+  color: var(--color-placeholder) !important;
+}
+
+/* Hover text states */
+.light-mode .hover\:text-gray-300:hover {
+  color: var(--color-text-tertiary) !important;
+}
+.light-mode .group:hover .group-hover\:text-primary-400 {
+  color: #0097a7 !important;
+}
+
+/* ---- Border overrides ---- */
+.light-mode .border-white\/\[0\.04\] {
+  border-color: var(--color-border-subtle) !important;
+}
+.light-mode .border-white\/\[0\.06\] {
+  border-color: var(--color-border) !important;
+}
+.light-mode .border-white\/\[0\.08\] {
+  border-color: var(--color-border-medium) !important;
+}
+.light-mode .border-white\/10 {
+  border-color: var(--color-border-strong) !important;
+}
+.light-mode .border-white\/15 {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+.light-mode .hover\:border-white\/\[0\.06\]:hover {
+  border-color: var(--color-border) !important;
+}
+
+/* Ring overrides */
+.light-mode .ring-black {
+  --tw-ring-color: var(--color-ring) !important;
+}
+.light-mode .ring-white\/\[0\.06\] {
+  --tw-ring-color: var(--color-border) !important;
+}
+
+/* ---- Input focus states ---- */
+.light-mode input,
+.light-mode select,
+.light-mode textarea {
+  color: var(--color-text-secondary) !important;
+}
+.light-mode input::placeholder,
+.light-mode textarea::placeholder {
+  color: var(--color-placeholder) !important;
+}
+
+/* ---- Select option backgrounds ---- */
+.light-mode option {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* ---- SVG wave fill ---- */
+.light-mode svg path[fill="#000000"] {
+  fill: var(--color-wave-fill) !important;
+}
+
+/* ---- Primary button text (keep dark on bright bg) ---- */
+.light-mode .bg-primary-500 .text-black,
+.light-mode .bg-primary-500.text-black,
+.light-mode .from-primary-500.text-black,
+.light-mode .bg-gradient-to-br.from-primary-500 .text-black {
+  color: #000000 !important;
+}
+
+/* ---- Neon shadow utilities in light mode ---- */
+.light-mode .shadow-lg.shadow-primary-500\/30,
+.light-mode .shadow-lg.shadow-primary-500\/25,
+.light-mode .shadow-lg.shadow-primary-500\/40,
+.light-mode [class*="shadow-primary-500"] {
+  --tw-shadow-color: rgba(0, 150, 167, 0.15) !important;
+}
+
+/* ---- Transition smoothness ---- */
+.light-mode *:not([class*="animate-"]) {
+  transition-property: background-color, color, border-color, box-shadow;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
+/* ---- Light mode border-glow ---- */
+.light-mode .border-glow {
+  box-shadow: inset 0 0 10px rgba(0, 150, 167, 0.03), 0 0 10px rgba(0, 150, 167, 0.05);
+}
+
+/* ---- Primary text color adjustments for light mode ---- */
+.light-mode .text-primary-200 {
+  color: #0097a7 !important;
+}
+.light-mode .text-primary-300 {
+  color: #00838f !important;
+}
+.light-mode .text-primary-400 {
+  color: #00796b !important;
+}
+.light-mode .text-primary-500 {
+  color: #00695c !important;
+}
+.light-mode .text-primary-500\/60 {
+  color: rgba(0, 105, 92, 0.6) !important;
+}
+.light-mode .text-primary-600 {
+  color: #004d40 !important;
+}
+.light-mode .hover\:text-primary-300:hover {
+  color: #00838f !important;
+}
+.light-mode .hover\:text-primary-400:hover {
+  color: #00796b !important;
+}
+.light-mode .hover\:text-primary-700:hover {
+  color: #004d40 !important;
+}
+
+/* ---- Gradient text fix: to-white becomes invisible on light bg ---- */
+.light-mode .bg-clip-text.text-transparent {
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}
+.light-mode .to-white.bg-clip-text,
+.light-mode .bg-gradient-to-r.to-white {
+  --tw-gradient-to: #004d40 !important;
+}
+.light-mode .to-accent-green {
+  --tw-gradient-to: #2e7d32 !important;
+}
+.light-mode .from-primary-400.via-primary-300.to-accent-green {
+  --tw-gradient-from: #0097a7 !important;
+  --tw-gradient-via: #00838f !important;
+  --tw-gradient-to: #2e7d32 !important;
+}
+
+/* ---- Primary background tints (darken for light mode contrast) ---- */
+.light-mode .bg-primary-500\/5 {
+  background-color: rgba(0, 150, 167, 0.06) !important;
+}
+.light-mode .bg-primary-500\/10 {
+  background-color: rgba(0, 150, 167, 0.08) !important;
+}
+.light-mode .bg-primary-500\/15 {
+  background-color: rgba(0, 150, 167, 0.10) !important;
+}
+.light-mode .bg-primary-700\/10 {
+  background-color: rgba(0, 105, 92, 0.08) !important;
+}
+.light-mode .hover\:bg-primary-500\/10:hover {
+  background-color: rgba(0, 150, 167, 0.12) !important;
+}
+.light-mode .hover\:bg-primary-500\/5:hover {
+  background-color: rgba(0, 150, 167, 0.08) !important;
+}
+
+/* ---- Primary button: keep solid & readable ---- */
+.light-mode .bg-primary-500 {
+  background-color: #0097a7 !important;
+}
+.light-mode .hover\:bg-primary-400:hover {
+  background-color: #00acc1 !important;
+}
+.light-mode .bg-primary-500.text-black,
+.light-mode .bg-primary-500 .text-black {
+  color: #ffffff !important;
+}
+.light-mode .text-black {
+  color: var(--color-text-primary) !important;
+}
+/* Keep text-black on primary buttons white */
+.light-mode .bg-primary-500.text-black {
+  color: #ffffff !important;
+}
+.light-mode .bg-gradient-to-br.from-primary-500 .text-black,
+.light-mode .from-primary-500.to-primary-600 .text-black,
+.light-mode .from-primary-500.to-primary-700 .text-black {
+  color: #ffffff !important;
+}
+/* Logo icon stays visible */
+.light-mode .from-primary-500 .text-black,
+.light-mode .from-emerald-500 .text-black {
+  color: #ffffff !important;
+}
+
+/* ---- Primary border tints ---- */
+.light-mode .border-primary-500\/10 {
+  border-color: rgba(0, 150, 167, 0.12) !important;
+}
+.light-mode .border-primary-500\/15 {
+  border-color: rgba(0, 150, 167, 0.15) !important;
+}
+.light-mode .border-primary-500\/20 {
+  border-color: rgba(0, 150, 167, 0.20) !important;
+}
+.light-mode .border-primary-500\/30 {
+  border-color: rgba(0, 150, 167, 0.25) !important;
+}
+.light-mode .border-primary-500\/40 {
+  border-color: rgba(0, 150, 167, 0.30) !important;
+}
+.light-mode .hover\:border-primary-500\/15:hover {
+  border-color: rgba(0, 150, 167, 0.18) !important;
+}
+.light-mode .hover\:border-primary-500\/20:hover {
+  border-color: rgba(0, 150, 167, 0.22) !important;
+}
+.light-mode .hover\:border-primary-500\/30:hover {
+  border-color: rgba(0, 150, 167, 0.28) !important;
+}
+
+/* ---- SOS modal overlay ---- */
+.light-mode .bg-black\/70 {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ---- Disabled states ---- */
+.light-mode .disabled\:bg-gray-800:disabled {
+  background-color: #e2e8f0 !important;
+}
+.light-mode .disabled\:text-gray-600:disabled {
+  color: #94a3b8 !important;
+}
+.light-mode .disabled\:from-gray-600:disabled {
+  --tw-gradient-from: #cbd5e1 !important;
+}
+.light-mode .disabled\:to-gray-600:disabled {
+  --tw-gradient-to: #cbd5e1 !important;
+}
+
+/* ---- Hamburger lines ---- */
+.light-mode .bg-gray-400 {
+  background-color: #64748b !important;
+}
+
+/* ---- Focus rings ---- */
+.light-mode .focus\:ring-primary-500:focus,
+.light-mode .focus-within\:border-primary-500\/40:focus-within {
+  --tw-ring-color: rgba(0, 150, 167, 0.4) !important;
+  border-color: rgba(0, 150, 167, 0.3) !important;
+}
+.light-mode .focus-within\:shadow-neon:focus-within {
+  box-shadow: 0 0 8px rgba(0, 150, 167, 0.15), 0 0 16px rgba(0, 150, 167, 0.08) !important;
+}
+
+/* ---- Shadow color overrides ---- */
+.light-mode [class*="shadow-primary-500\/"] {
+  --tw-shadow-color: rgba(0, 150, 167, 0.12) !important;
+}
+.light-mode [class*="shadow-red-500\/"] {
+  --tw-shadow-color: rgba(239, 68, 68, 0.12) !important;
+}
+.light-mode [class*="shadow-emerald-500\/"] {
+  --tw-shadow-color: rgba(16, 185, 129, 0.12) !important;
+}
+
+/* ---- Gradient backgrounds for primary cards ---- */
+.light-mode .from-primary-700 {
+  --tw-gradient-from: #0097a7 !important;
+}
+.light-mode .via-primary-600 {
+  --tw-gradient-via: #00acc1 !important;
+}
+.light-mode .to-primary-800 {
+  --tw-gradient-to: #00838f !important;
+}
+.light-mode .from-primary-500.to-primary-600 {
+  --tw-gradient-from: #0097a7 !important;
+  --tw-gradient-to: #00838f !important;
+}
+.light-mode .from-primary-500.to-primary-700 {
+  --tw-gradient-from: #0097a7 !important;
+  --tw-gradient-to: #00695c !important;
+}
+.light-mode .from-primary-400.to-primary-600 {
+  --tw-gradient-from: #00acc1 !important;
+  --tw-gradient-to: #00838f !important;
+}
+
+/* ---- Hero grid pattern: slightly visible on light ---- */
+.light-mode .opacity-\[0\.04\] {
+  opacity: 0.06 !important;
+}
+
+/* ---- Feature card gradient overlays ---- */
+.light-mode .from-emerald-500\/10 {
+  --tw-gradient-from: rgba(16, 185, 129, 0.08) !important;
+}
+.light-mode .to-green-500\/10 {
+  --tw-gradient-to: rgba(34, 197, 94, 0.08) !important;
+}
+.light-mode .from-violet-500\/10 {
+  --tw-gradient-from: rgba(139, 92, 246, 0.08) !important;
+}
+.light-mode .to-purple-500\/10 {
+  --tw-gradient-to: rgba(168, 85, 247, 0.08) !important;
+}
+.light-mode .from-rose-500\/10 {
+  --tw-gradient-from: rgba(244, 63, 94, 0.08) !important;
+}
+.light-mode .to-pink-500\/10 {
+  --tw-gradient-to: rgba(236, 72, 153, 0.08) !important;
+}
+.light-mode .from-primary-500\/10.to-primary-700\/10 {
+  --tw-gradient-from: rgba(0, 150, 167, 0.08) !important;
+  --tw-gradient-to: rgba(0, 105, 92, 0.08) !important;
+}
+
+/* ---- Emerald/Green health tips section ---- */
+.light-mode .border-emerald-500\/15 {
+  border-color: rgba(16, 185, 129, 0.15) !important;
+}
+.light-mode .border-emerald-500\/20 {
+  border-color: rgba(16, 185, 129, 0.20) !important;
+}
+.light-mode .from-emerald-500.to-green-600 {
+  --tw-gradient-from: #10b981 !important;
+  --tw-gradient-to: #16a34a !important;
+}
+
+/* ---- UserProfile toggle track ---- */
+.light-mode .bg-\[\#111\] {
+  background-color: #cbd5e1 !important;
+}
+
+/* ---- Red accent elements (error borders, emergency) ---- */
+.light-mode .border-red-500\/15 {
+  border-color: rgba(239, 68, 68, 0.15) !important;
+}
+.light-mode .border-red-500\/20 {
+  border-color: rgba(239, 68, 68, 0.18) !important;
+}
+.light-mode .border-red-400\/30 {
+  border-color: rgba(248, 113, 113, 0.25) !important;
+}
+.light-mode .bg-red-500\/5 {
+  background-color: rgba(239, 68, 68, 0.05) !important;
+}
+.light-mode .bg-red-500\/10 {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+}
+
+/* ---- Via-primary divider lines ---- */
+.light-mode .via-primary-500\/20 {
+  --tw-gradient-via: rgba(0, 150, 167, 0.15) !important;
+}
+.light-mode .via-primary-500 {
+  --tw-gradient-via: #0097a7 !important;
+}
+
