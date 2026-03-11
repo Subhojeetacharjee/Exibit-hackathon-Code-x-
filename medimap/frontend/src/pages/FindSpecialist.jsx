@@ -4,26 +4,9 @@ import SymptomInput from '../components/SymptomInput';
 import SpecialistCard from '../components/SpecialistCard';
 import HealthTips from '../components/HealthTips';
 import Footer from '../components/Footer';
+import { predictSpecialist } from '../lib/api';
 
-// Symptom to specialist mapping
-const symptomMapping = {
-  headache: { specialist: 'Neurologist', urgency: 'medium' },
-  dizziness: { specialist: 'Neurologist', urgency: 'medium' },
-  fever: { specialist: 'General Physician', urgency: 'medium' },
-  'skin rash': { specialist: 'Dermatologist', urgency: 'low' },
-  rash: { specialist: 'Dermatologist', urgency: 'low' },
-  'chest pain': { specialist: 'Cardiologist', urgency: 'high' },
-  'ear pain': { specialist: 'ENT Specialist', urgency: 'low' },
-  cough: { specialist: 'Pulmonologist', urgency: 'low' },
-  'stomach pain': { specialist: 'Gastroenterologist', urgency: 'medium' },
-  'back pain': { specialist: 'Orthopedist', urgency: 'low' },
-  anxiety: { specialist: 'Psychiatrist', urgency: 'medium' },
-  depression: { specialist: 'Psychiatrist', urgency: 'medium' },
-  'eye pain': { specialist: 'Ophthalmologist', urgency: 'medium' },
-  'tooth pain': { specialist: 'Dentist', urgency: 'medium' },
-};
-
-// Health tips mapping
+// Health tips mapping (display data)
 const healthTipsMapping = {
   headache: ['Drink plenty of water', 'Rest your eyes', 'Avoid screen exposure', 'Take a short nap'],
   dizziness: ['Sit or lie down immediately', 'Drink water', 'Avoid sudden movements', 'Get fresh air'],
@@ -32,6 +15,12 @@ const healthTipsMapping = {
   'chest pain': ['Stop all activity', 'Call emergency services', 'Chew aspirin if available', 'Stay calm'],
   'ear pain': ['Apply warm compress', 'Keep ear dry', 'Avoid inserting objects', 'Rest head elevated'],
   cough: ['Drink warm fluids', 'Use honey', 'Avoid cold drinks', 'Steam inhalation'],
+  'stomach pain': ['Avoid spicy food', 'Drink warm water', 'Rest after meals', 'Eat light food'],
+  'back pain': ['Apply hot/cold compress', 'Maintain posture', 'Gentle stretching', 'Avoid heavy lifting'],
+  anxiety: ['Practice deep breathing', 'Go for a walk', 'Limit caffeine', 'Talk to someone you trust'],
+  depression: ['Stay connected with people', 'Maintain a routine', 'Exercise regularly', 'Seek professional help'],
+  'eye pain': ['Rest your eyes', 'Reduce screen time', 'Use eye drops', 'Wear sunglasses outdoors'],
+  'tooth pain': ['Rinse with warm salt water', 'Avoid hot/cold foods', 'Use clove oil', 'See a dentist soon'],
 };
 
 const FindSpecialist = () => {
@@ -39,72 +28,47 @@ const FindSpecialist = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
 
-  const analyzeSymptoms = () => {
+  const analyzeSymptoms = async () => {
     setIsLoading(true);
-    
-    setTimeout(() => {
-      const input = symptoms.toLowerCase();
-      const detectedSymptoms = [];
-      let specialist = 'General Physician';
-      let urgency = 'low';
+    try {
+      const data = await predictSpecialist(symptoms);
+
+      // Build health tips from detected symptoms
       const tips = [];
-
-      Object.keys(symptomMapping).forEach((symptom) => {
-        if (input.includes(symptom)) {
-          detectedSymptoms.push(symptom.charAt(0).toUpperCase() + symptom.slice(1));
-          const mapping = symptomMapping[symptom];
-          
-          if (mapping.urgency === 'high' || urgency !== 'high') {
-            if (mapping.urgency === 'high') {
-              urgency = 'high';
-              specialist = mapping.specialist;
-            } else if (mapping.urgency === 'medium' && urgency !== 'high') {
-              urgency = 'medium';
-              specialist = mapping.specialist;
-            } else if (urgency === 'low') {
-              specialist = mapping.specialist;
-            }
-          }
-
-          if (healthTipsMapping[symptom]) {
-            tips.push({
-              symptom: symptom.charAt(0).toUpperCase() + symptom.slice(1),
-              tips: healthTipsMapping[symptom],
-            });
-          }
+      data.detected_symptoms.forEach((s) => {
+        const key = s.toLowerCase();
+        if (healthTipsMapping[key]) {
+          tips.push({ symptom: s, tips: healthTipsMapping[key] });
         }
       });
-
-      if (detectedSymptoms.length === 0) {
-        detectedSymptoms.push('General symptoms');
+      if (tips.length === 0) {
+        tips.push({
+          symptom: 'General Care',
+          tips: ['Stay hydrated', 'Get adequate rest', 'Monitor your symptoms', 'Consult a doctor if symptoms persist'],
+        });
       }
 
       setResult({
-        specialist,
-        urgency,
-        description: `Based on your symptoms, we recommend consulting a ${specialist}. ${
-          urgency === 'high' ? 'Please seek immediate medical attention.' : 
-          urgency === 'medium' ? 'Schedule an appointment soon.' : 
-          'You can schedule a routine checkup.'
-        }`,
-        symptoms: detectedSymptoms,
-        tips: tips.length > 0 ? tips : [{ 
-          symptom: 'General Care', 
-          tips: ['Stay hydrated', 'Get adequate rest', 'Monitor your symptoms', 'Consult a doctor if symptoms persist'] 
-        }],
+        specialist: data.specialty,
+        urgency: data.urgency,
+        description: data.description,
+        symptoms: data.detected_symptoms,
+        tips,
       });
 
-      // Save to search history
+      // Save to localStorage search history
       const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
       history.unshift({
-        symptom: detectedSymptoms[0],
-        specialist,
+        symptom: data.detected_symptoms[0],
+        specialist: data.specialty,
         timestamp: new Date().toLocaleString(),
       });
       localStorage.setItem('searchHistory', JSON.stringify(history.slice(0, 10)));
-
+    } catch (err) {
+      console.error('Analysis failed:', err);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (

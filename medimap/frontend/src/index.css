@@ -164,12 +164,10 @@ body {
   background: #00e5ff;
 }
 
-/* Leaflet overrides */
-.leaflet-container {
-  height: 100%;
-  width: 100%;
-  border-radius: 1rem;
-}
+/* Google Maps overrides */
+.gm-style { border-radius: 1rem; }
+.gm-style .gm-style-iw-c { border-radius: 0.75rem; }
+.gm-style .gm-style-iw-d { overflow: auto !important; }
 
 /* ---- Animations ---- */
 @keyframes fadeInUp {

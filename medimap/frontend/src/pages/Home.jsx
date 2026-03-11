@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Phone, X, AlertTriangle, Ambulance } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
@@ -10,90 +10,9 @@ import ClinicCard from '../components/ClinicCard';
 import FilterBar from '../components/FilterBar';
 import SearchHistory from '../components/SearchHistory';
 import Footer from '../components/Footer';
+import { predictSpecialist, getNearbyClinics, getUserLocation, transformClinic } from '../lib/api';
 
-// Dummy data for clinics
-const clinicsData = [
-  {
-    id: 1,
-    name: 'City Care Clinic',
-    distance: '1.2 km',
-    distanceValue: 1.2,
-    fee: 200,
-    rating: 4.5,
-    reviews: 128,
-    position: [28.6239, 77.2090],
-  },
-  {
-    id: 2,
-    name: 'HealthFirst Medical Center',
-    distance: '1.8 km',
-    distanceValue: 1.8,
-    fee: 350,
-    rating: 4.8,
-    reviews: 256,
-    position: [28.6139, 77.2190],
-  },
-  {
-    id: 3,
-    name: 'MedPlus Clinic',
-    distance: '2.5 km',
-    distanceValue: 2.5,
-    fee: 150,
-    rating: 4.2,
-    reviews: 89,
-    position: [28.6039, 77.1990],
-  },
-  {
-    id: 4,
-    name: 'Apollo Spectra',
-    distance: '3.1 km',
-    distanceValue: 3.1,
-    fee: 500,
-    rating: 4.9,
-    reviews: 512,
-    position: [28.6339, 77.2290],
-  },
-  {
-    id: 5,
-    name: 'Family Health Clinic',
-    distance: '0.8 km',
-    distanceValue: 0.8,
-    fee: 180,
-    rating: 4.3,
-    reviews: 67,
-    position: [28.6189, 77.2040],
-  },
-  {
-    id: 6,
-    name: 'Sunrise Medical',
-    distance: '4.2 km',
-    distanceValue: 4.2,
-    fee: 120,
-    rating: 4.0,
-    reviews: 45,
-    position: [28.5939, 77.2190],
-  },
-];
-
-// Symptom to specialist mapping
-const symptomMapping = {
-  headache: { specialist: 'Neurologist', urgency: 'medium' },
-  dizziness: { specialist: 'Neurologist', urgency: 'medium' },
-  fever: { specialist: 'General Physician', urgency: 'medium' },
-  'skin rash': { specialist: 'Dermatologist', urgency: 'low' },
-  rash: { specialist: 'Dermatologist', urgency: 'low' },
-  'chest pain': { specialist: 'Cardiologist', urgency: 'high' },
-  'ear pain': { specialist: 'ENT Specialist', urgency: 'low' },
-  cough: { specialist: 'Pulmonologist', urgency: 'low' },
-  'stomach pain': { specialist: 'Gastroenterologist', urgency: 'medium' },
-  'back pain': { specialist: 'Orthopedist', urgency: 'low' },
-  anxiety: { specialist: 'Psychiatrist', urgency: 'medium' },
-  depression: { specialist: 'Psychiatrist', urgency: 'medium' },
-  'eye pain': { specialist: 'Ophthalmologist', urgency: 'medium' },
-  'tooth pain': { specialist: 'Dentist', urgency: 'medium' },
-};
-
-// Health tips mapping
+// Health tips mapping (display data — stays client-side)
 const healthTipsMapping = {
   headache: ['Drink plenty of water', 'Rest your eyes', 'Avoid screen exposure', 'Take a short nap'],
   dizziness: ['Sit or lie down immediately', 'Drink water', 'Avoid sudden movements', 'Get fresh air'],
@@ -102,112 +21,114 @@ const healthTipsMapping = {
   'chest pain': ['Stop all activity', 'Call emergency services', 'Chew aspirin if available', 'Stay calm'],
   'ear pain': ['Apply warm compress', 'Keep ear dry', 'Avoid inserting objects', 'Rest head elevated'],
   cough: ['Drink warm fluids', 'Use honey', 'Avoid cold drinks', 'Steam inhalation'],
+  'stomach pain': ['Avoid spicy food', 'Drink warm water', 'Rest after meals', 'Eat light food'],
+  'back pain': ['Apply hot/cold compress', 'Maintain posture', 'Gentle stretching', 'Avoid heavy lifting'],
+  anxiety: ['Practice deep breathing', 'Go for a walk', 'Limit caffeine', 'Talk to someone you trust'],
+  depression: ['Stay connected with people', 'Maintain a routine', 'Exercise regularly', 'Seek professional help'],
+  'eye pain': ['Rest your eyes', 'Reduce screen time', 'Use eye drops', 'Wear sunglasses outdoors'],
+  'tooth pain': ['Rinse with warm salt water', 'Avoid hot/cold foods', 'Use clove oil', 'See a dentist soon'],
 };
+
+const DEFAULT_LOCATION = { lat: 28.6139, lng: 77.2090 }; // Delhi fallback
 
 const Home = () => {
   const [symptoms, setSymptoms] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [activeFilter, setActiveFilter] = useState('closest');
-  const [clinics, setClinics] = useState(clinicsData);
+  const [clinics, setClinics] = useState([]);
   const [showSOS, setShowSOS] = useState(false);
-  const [searchHistory, setSearchHistory] = useState([
-    { symptom: 'Headache', specialist: 'Neurologist', timestamp: '2 hours ago' },
-    { symptom: 'Skin rash', specialist: 'Dermatologist', timestamp: 'Yesterday' },
-    { symptom: 'Ear pain', specialist: 'ENT Specialist', timestamp: '2 days ago' },
-  ]);
+  const [userLocation, setUserLocation] = useState(null);
+  const [searchHistory, setSearchHistory] = useState(() => {
+    const stored = localStorage.getItem('searchHistory');
+    return stored ? JSON.parse(stored) : [];
+  });
 
-  // Sort clinics based on active filter
+  // Get user location on mount
   useEffect(() => {
-    const sorted = [...clinicsData];
+    getUserLocation()
+      .then(setUserLocation)
+      .catch(() => setUserLocation(DEFAULT_LOCATION));
+  }, []);
+
+  // Derive sorted clinics from current filter
+  const sortedClinics = useMemo(() => {
+    const sorted = [...clinics];
     switch (activeFilter) {
       case 'closest':
         sorted.sort((a, b) => a.distanceValue - b.distanceValue);
         break;
       case 'cheapest':
-        sorted.sort((a, b) => a.fee - b.fee);
+        sorted.sort((a, b) => (a.fee ?? 999) - (b.fee ?? 999));
         break;
       case 'rated':
-        sorted.sort((a, b) => b.rating - a.rating);
+        sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
       default:
         break;
     }
-    setClinics(sorted);
-  }, [activeFilter]);
+    return sorted;
+  }, [clinics, activeFilter]);
 
-  const analyzeSymptoms = () => {
+  const analyzeSymptoms = async () => {
     setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      const input = symptoms.toLowerCase();
-      const detectedSymptoms = [];
-      let specialist = 'General Physician';
-      let urgency = 'low';
+    try {
+      const data = await predictSpecialist(symptoms);
+
+      // Build health tips from detected symptoms
       const tips = [];
-
-      // Find matching symptoms
-      Object.keys(symptomMapping).forEach((symptom) => {
-        if (input.includes(symptom)) {
-          detectedSymptoms.push(symptom.charAt(0).toUpperCase() + symptom.slice(1));
-          const mapping = symptomMapping[symptom];
-          
-          // Take the highest urgency
-          if (mapping.urgency === 'high' || urgency !== 'high') {
-            if (mapping.urgency === 'high') {
-              urgency = 'high';
-              specialist = mapping.specialist;
-            } else if (mapping.urgency === 'medium' && urgency !== 'high') {
-              urgency = 'medium';
-              specialist = mapping.specialist;
-            } else if (urgency === 'low') {
-              specialist = mapping.specialist;
-            }
-          }
-
-          // Collect tips
-          if (healthTipsMapping[symptom]) {
-            tips.push({
-              symptom: symptom.charAt(0).toUpperCase() + symptom.slice(1),
-              tips: healthTipsMapping[symptom],
-            });
-          }
+      data.detected_symptoms.forEach((s) => {
+        const key = s.toLowerCase();
+        if (healthTipsMapping[key]) {
+          tips.push({ symptom: s, tips: healthTipsMapping[key] });
         }
       });
-
-      if (detectedSymptoms.length === 0) {
-        detectedSymptoms.push('General symptoms');
+      if (tips.length === 0) {
+        tips.push({
+          symptom: 'General Care',
+          tips: ['Stay hydrated', 'Get adequate rest', 'Monitor your symptoms', 'Consult a doctor if symptoms persist'],
+        });
       }
 
       setResult({
-        specialist,
-        urgency,
-        description: `Based on your symptoms, we recommend consulting a ${specialist}. ${
-          urgency === 'high' ? 'Please seek immediate medical attention.' : 
-          urgency === 'medium' ? 'Schedule an appointment soon.' : 
-          'You can schedule a routine checkup.'
-        }`,
-        symptoms: detectedSymptoms,
-        tips: tips.length > 0 ? tips : [{ 
-          symptom: 'General Care', 
-          tips: ['Stay hydrated', 'Get adequate rest', 'Monitor your symptoms', 'Consult a doctor if symptoms persist'] 
-        }],
+        specialist: data.specialty,
+        urgency: data.urgency,
+        description: data.description,
+        symptoms: data.detected_symptoms,
+        tips,
       });
 
-      // Add to search history
-      setSearchHistory(prev => [
-        { symptom: detectedSymptoms[0], specialist, timestamp: 'Just now' },
-        ...prev.slice(0, 5),
-      ]);
+      // Save to search history
+      const entry = {
+        symptom: data.detected_symptoms[0],
+        specialist: data.specialty,
+        timestamp: new Date().toLocaleString(),
+      };
+      setSearchHistory((prev) => {
+        const updated = [entry, ...prev.slice(0, 9)];
+        localStorage.setItem('searchHistory', JSON.stringify(updated));
+        return updated;
+      });
 
+      // Fetch nearby clinics from backend
+      const loc = userLocation || DEFAULT_LOCATION;
+      const rawClinics = await getNearbyClinics(loc.lat, loc.lng, data.specialty);
+      setClinics(rawClinics.map((c) => transformClinic(c, loc.lat, loc.lng)));
+    } catch (err) {
+      console.error('Analysis failed:', err);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const clearHistory = () => {
     setSearchHistory([]);
+    localStorage.removeItem('searchHistory');
   };
+
+  const mapCenter = userLocation
+    ? [userLocation.lat, userLocation.lng]
+    : [DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lng];
 
   return (
     <div className="min-h-screen bg-black">
@@ -232,18 +153,21 @@ const Home = () => {
         </>
       )}
       
-      <ClinicMap clinics={clinics} />
-      
-      <section className="py-10 px-4">
-        <div className="max-w-6xl mx-auto animate-fade-in-up">
-          <FilterBar activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {clinics.map((clinic) => (
-              <ClinicCard key={clinic.id} clinic={clinic} />
-            ))}
-          </div>
-        </div>
-      </section>
+      {sortedClinics.length > 0 && (
+        <>
+          <ClinicMap clinics={sortedClinics} center={mapCenter} />
+          <section className="py-10 px-4">
+            <div className="max-w-6xl mx-auto animate-fade-in-up">
+              <FilterBar activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {sortedClinics.map((clinic) => (
+                  <ClinicCard key={clinic.id} clinic={clinic} />
+                ))}
+              </div>
+            </div>
+          </section>
+        </>
+      )}
       
       <SearchHistory history={searchHistory} onClear={clearHistory} />
       <Footer />

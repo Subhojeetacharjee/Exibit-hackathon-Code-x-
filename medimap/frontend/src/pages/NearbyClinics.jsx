@@ -1,136 +1,66 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import ClinicMap from '../components/ClinicMap';
 import ClinicCard from '../components/ClinicCard';
 import FilterBar from '../components/FilterBar';
 import Footer from '../components/Footer';
-import { MapPin, Search } from 'lucide-react';
+import { MapPin, Search, Loader2 } from 'lucide-react';
+import { getNearbyClinics, getUserLocation, transformClinic } from '../lib/api';
 
-// Dummy data for clinics
-const clinicsData = [
-  {
-    id: 1,
-    name: 'City Care Clinic',
-    distance: '1.2 km',
-    distanceValue: 1.2,
-    fee: 200,
-    rating: 4.5,
-    reviews: 128,
-    position: [28.6239, 77.2090],
-    specialty: 'Multi-specialty',
-  },
-  {
-    id: 2,
-    name: 'HealthFirst Medical Center',
-    distance: '1.8 km',
-    distanceValue: 1.8,
-    fee: 350,
-    rating: 4.8,
-    reviews: 256,
-    position: [28.6139, 77.2190],
-    specialty: 'General Physician',
-  },
-  {
-    id: 3,
-    name: 'MedPlus Clinic',
-    distance: '2.5 km',
-    distanceValue: 2.5,
-    fee: 150,
-    rating: 4.2,
-    reviews: 89,
-    position: [28.6039, 77.1990],
-    specialty: 'Family Medicine',
-  },
-  {
-    id: 4,
-    name: 'Apollo Spectra',
-    distance: '3.1 km',
-    distanceValue: 3.1,
-    fee: 500,
-    rating: 4.9,
-    reviews: 512,
-    position: [28.6339, 77.2290],
-    specialty: 'Multi-specialty',
-  },
-  {
-    id: 5,
-    name: 'Family Health Clinic',
-    distance: '0.8 km',
-    distanceValue: 0.8,
-    fee: 180,
-    rating: 4.3,
-    reviews: 67,
-    position: [28.6189, 77.2040],
-    specialty: 'General Physician',
-  },
-  {
-    id: 6,
-    name: 'Sunrise Medical',
-    distance: '4.2 km',
-    distanceValue: 4.2,
-    fee: 120,
-    rating: 4.0,
-    reviews: 45,
-    position: [28.5939, 77.2190],
-    specialty: 'General Medicine',
-  },
-  {
-    id: 7,
-    name: 'Care Plus Hospital',
-    distance: '2.0 km',
-    distanceValue: 2.0,
-    fee: 400,
-    rating: 4.6,
-    reviews: 234,
-    position: [28.6089, 77.2140],
-    specialty: 'Multi-specialty',
-  },
-  {
-    id: 8,
-    name: 'LifeLine Clinic',
-    distance: '1.5 km',
-    distanceValue: 1.5,
-    fee: 250,
-    rating: 4.4,
-    reviews: 156,
-    position: [28.6209, 77.2020],
-    specialty: 'Cardiology',
-  },
-];
+const DEFAULT_LOCATION = { lat: 28.6139, lng: 77.2090 };
 
 const NearbyClinics = () => {
+  const [searchParams] = useSearchParams();
   const [activeFilter, setActiveFilter] = useState('closest');
-  const [clinics, setClinics] = useState(clinicsData);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [clinics, setClinics] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('specialty') || '');
+  const [userLocation, setUserLocation] = useState(null);
+  const [loading, setLoading] = useState(false);
 
+  // Get user location on mount
   useEffect(() => {
-    let filtered = [...clinicsData];
-    
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(clinic => 
-        clinic.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        clinic.specialty.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    // Sort by active filter
+    getUserLocation()
+      .then(setUserLocation)
+      .catch(() => setUserLocation(DEFAULT_LOCATION));
+  }, []);
+
+  // Fetch clinics when location is available or search changes
+  useEffect(() => {
+    if (!userLocation) return;
+    const query = searchTerm.trim() || 'hospital clinic';
+    setLoading(true);
+    getNearbyClinics(userLocation.lat, userLocation.lng, query)
+      .then((raw) => {
+        const transformed = raw.map((c) => transformClinic(c, userLocation.lat, userLocation.lng));
+        setClinics(transformed);
+      })
+      .catch((err) => console.error('Failed to fetch clinics:', err))
+      .finally(() => setLoading(false));
+  }, [userLocation, searchTerm]);
+
+  // Derive sorted clinics from current filter — always stays in sync
+  const sortedClinics = useMemo(() => {
+    const sorted = [...clinics];
     switch (activeFilter) {
       case 'closest':
-        filtered.sort((a, b) => a.distanceValue - b.distanceValue);
+        sorted.sort((a, b) => a.distanceValue - b.distanceValue);
         break;
       case 'cheapest':
-        filtered.sort((a, b) => a.fee - b.fee);
+        sorted.sort((a, b) => (a.fee ?? 999) - (b.fee ?? 999));
         break;
       case 'rated':
-        filtered.sort((a, b) => b.rating - a.rating);
+        sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
       default:
         break;
     }
-    
-    setClinics(filtered);
-  }, [activeFilter, searchTerm]);
+    return sorted;
+  }, [clinics, activeFilter]);
+
+  const mapCenter = userLocation
+    ? [userLocation.lat, userLocation.lng]
+    : [DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lng];
 
   return (
     <div className="min-h-screen bg-black">
@@ -160,9 +90,12 @@ const NearbyClinics = () => {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
               <input
                 type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search clinics by name or specialty..."
+                defaultValue={searchTerm}
+                onChange={(e) => {
+                  clearTimeout(window._clinicSearchTimer);
+                  window._clinicSearchTimer = setTimeout(() => setSearchTerm(e.target.value), 600);
+                }}
+                placeholder="Search by specialty (e.g. cardiologist, dentist)..."
                 className="w-full pl-11 pr-4 py-3.5 border border-white/[0.08] rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none text-sm bg-white/[0.03] text-gray-200 placeholder-gray-600"
               />
             </div>
@@ -171,26 +104,27 @@ const NearbyClinics = () => {
       </div>
 
       {/* Map */}
-      <ClinicMap clinics={clinics} />
+      <ClinicMap clinics={sortedClinics} center={mapCenter} />
 
       {/* Clinic List */}
       <section className="py-10 px-4">
         <div className="max-w-6xl mx-auto animate-fade-in-up">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-extrabold text-white tracking-tight">
-              {clinics.length} Clinics Found
+              {loading ? 'Searching...' : `${sortedClinics.length} Clinics Found`}
             </h2>
+            {loading && <Loader2 className="h-5 w-5 text-primary-400 animate-spin" />}
           </div>
           
           <FilterBar activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
           
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {clinics.map((clinic) => (
+            {sortedClinics.map((clinic) => (
               <ClinicCard key={clinic.id} clinic={clinic} />
             ))}
           </div>
           
-          {clinics.length === 0 && (
+          {sortedClinics.length === 0 && (
             <div className="text-center py-12">
               <div className="bg-[#050505] w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <MapPin className="h-10 w-10 text-gray-600" />

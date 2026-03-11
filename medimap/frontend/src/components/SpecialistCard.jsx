@@ -59,7 +59,7 @@ const SpecialistCard = ({ specialist, urgency, description, symptoms }) => {
             </div>
 
             <Link
-              to="/clinics"
+              to={`/clinics?specialty=${encodeURIComponent(specialist)}`}
               className="group w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-400 text-black py-3.5 rounded-2xl font-bold text-sm transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 mt-2"
             >
               Find Nearby Clinics

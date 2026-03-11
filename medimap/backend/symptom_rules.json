@@ -1,0 +1,207 @@
+[
+  {
+    "keywords": ["chest pain", "severe chest pain", "pressure in chest"],
+    "specialty": "cardiologist",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["palpitations", "irregular heartbeat", "heart racing"],
+    "specialty": "cardiologist",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["high blood pressure", "hypertension", "elevated bp"],
+    "specialty": "cardiologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["difficulty breathing", "shortness of breath", "breathing problem"],
+    "specialty": "pulmonologist",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["persistent cough", "chronic cough"],
+    "specialty": "pulmonologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["wheezing", "asthma attack"],
+    "specialty": "pulmonologist",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["headache", "migraine", "dizziness"],
+    "specialty": "neurologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["seizure", "convulsions", "epileptic attack"],
+    "specialty": "neurologist",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["memory loss", "difficulty concentrating"],
+    "specialty": "neurologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["stomach pain", "abdominal pain", "indigestion"],
+    "specialty": "gastroenterologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["vomiting blood", "blood in stool"],
+    "specialty": "gastroenterologist",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["acid reflux", "heartburn"],
+    "specialty": "gastroenterologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["skin rash", "itching", "red spots"],
+    "specialty": "dermatologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["severe allergic reaction", "swelling of face", "hives"],
+    "specialty": "dermatologist",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["acne", "pimples"],
+    "specialty": "dermatologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["fever", "cough", "cold"],
+    "specialty": "general physician",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["high fever", "persistent fever"],
+    "specialty": "general physician",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["severe dehydration", "extreme weakness"],
+    "specialty": "general physician",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["joint pain", "arthritis", "stiff joints"],
+    "specialty": "orthopedic",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["broken bone", "fracture", "bone injury"],
+    "specialty": "orthopedic",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["back pain", "lower back pain"],
+    "specialty": "orthopedic",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["toothache", "tooth pain"],
+    "specialty": "dentist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["bleeding gums", "gum infection"],
+    "specialty": "dentist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["eye redness", "eye irritation"],
+    "specialty": "ophthalmologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["vision loss", "sudden blindness"],
+    "specialty": "ophthalmologist",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["blurred vision", "double vision"],
+    "specialty": "ophthalmologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["ear pain", "ear infection"],
+    "specialty": "ent specialist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["hearing loss", "ringing in ears"],
+    "specialty": "ent specialist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["severe throat pain", "difficulty swallowing"],
+    "specialty": "ent specialist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["frequent urination", "painful urination"],
+    "specialty": "urologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["blood in urine"],
+    "specialty": "urologist",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["kidney pain", "flank pain"],
+    "specialty": "urologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["irregular periods", "menstrual pain"],
+    "specialty": "gynecologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["pregnancy complications", "severe pregnancy bleeding"],
+    "specialty": "gynecologist",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["vaginal infection", "pelvic pain"],
+    "specialty": "gynecologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["anxiety", "panic attack"],
+    "specialty": "psychiatrist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["severe depression", "suicidal thoughts"],
+    "specialty": "psychiatrist",
+    "is_emergency": true
+  },
+  {
+    "keywords": ["sleep problems", "insomnia"],
+    "specialty": "psychiatrist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["high blood sugar", "diabetes symptoms"],
+    "specialty": "endocrinologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["thyroid swelling", "thyroid imbalance"],
+    "specialty": "endocrinologist",
+    "is_emergency": false
+  },
+  {
+    "keywords": ["low blood sugar", "hypoglycemia"],
+    "specialty": "endocrinologist",
+    "is_emergency": true
+  }
+]

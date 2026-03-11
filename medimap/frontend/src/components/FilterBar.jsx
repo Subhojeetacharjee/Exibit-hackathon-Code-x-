@@ -1,9 +1,8 @@
-import { MapPin, IndianRupee, Star } from 'lucide-react';
+import { MapPin, Star } from 'lucide-react';
 
 const FilterBar = ({ activeFilter, setActiveFilter }) => {
   const filters = [
     { id: 'closest', label: 'Closest', icon: MapPin },
-    { id: 'cheapest', label: 'Cheapest', icon: IndianRupee },
     { id: 'rated', label: 'Best Rated', icon: Star },
   ];
 
